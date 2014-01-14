@@ -30,8 +30,6 @@ Documentation
  - [DoctrineReader](#doctrinereader)
  - [ExcelReader](#excelreader)
  - [Create a reader](#create-a-reader)
- - [Sources](#sources)
-   - [Source filters](#source-filters) 
 * [Writers](#writers)
  - [ArrayWriter](#arraywriter)
  - [CsvWriter](#csvwriter)
