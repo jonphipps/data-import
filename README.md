@@ -44,6 +44,8 @@ Documentation
  - [ValidatorFilter](#offsetfilter)
 * [Converters](#converters)
   - [Item converters](#item-converters)
+    - [MappingItemConverter](#mappingitemconverter) 
+    - [CallbackItemConverter](#callbackitemconverter) 
   - [Value converters](#value-converters)
     - [DateTimeValueConverter](#datetimevalueconverter)
     - [ObjectConverter](#objectconverter)
@@ -250,7 +252,53 @@ _Note_
 Its recommend to add the ValidatorFilter before you add all other filters.
 For a detailed explanation see https://github.com/ddeboer/data-import/pull/47#issuecomment-31969949.
 
-### Item converters
+# Converters
+
+## Item converters
+
+### MappingItemConverter
+
+Use the MappingItemConverter to add mappings to your workflow. Your keys from your input data will be renamed according to these mappings. Say you have input data:
+
+```php
+$data = array(
+    array(
+        'foo' => 'bar',
+        'baz' => array(
+            'some' => 'value'
+        )
+    )
+);
+```
+
+You can map the keys `foo` and `baz` in the following way:
+
+```php
+
+use Ddeboer\DataImport\ItemConverter\MappingItemConverter;
+
+$converter = new MappingItemConverter();
+$converter->addMapping('foo', 'fooloo')
+    ->addMapping('baz', array('some' => 'else'));
+
+$workflow->addItemConverter($converter)
+    ->process();
+```
+
+Your output data will now be:
+
+```php
+array(
+    array(
+        'fooloo' => 'bar',
+        'baz'    => array(
+            'else' => 'value'
+        )
+    )
+);
+```
+
+### CallbackItemConverter
 
 ### Value converters
 
@@ -373,57 +421,6 @@ The converters defined in the list are applied on every data-item's value that m
             1 => array(
                 'name' => 'some name',
                 'price' => '12,16',
-            )
-        )
-    );
-```
-
-GlobalMapping
--------------
-
-The global-mapping allows you to define an array that is used to rename fields of an item.
-
-Using global-mapping can be used to add renaming-rules for a multi-level array and is applied
-after the standard-mapping rules are applied.
-
-```php
-    //...
-    $data = array(
-        0 => array(
-            'foo' => 'bar',
-            'baz' => array(
-                'some' => 'value',
-                'some2' => 'value'
-            )
-        )
-    );
-
-    // ...
-    // create the workflow and reader etc.
-    // ...
-
-    // this defines a single mapping
-    $workflow->addMapping('baz', 'bazinga');
-
-    // this defines renaming global rules
-    $workflow->setGlobalMapping(array(
-        'foo' => 'fooloo',
-
-        // we need to use the new name here because global mapping is applied after standard mapping
-        'bazinga' => array(
-            'some' => 'something',
-            'some2' => 'somethingelse'
-        )
-    ));
-
-    // ..
-    // after filtering data looks as follows
-    $data = array(
-        0 => array(
-            'fooloo' => 'bar',
-            'bazinga' => array(
-                'something' => 'value',
-                'somethingelse' => 'value'
             )
         )
     );
